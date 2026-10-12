@@ -1,0 +1,28 @@
+{
+  "name": "Moshu Jiuba",
+  "live_url": "https://moshucorp.com",
+  "notes": "Reference deployment. Public values only; the admin allowlist lives in the database, not here.",
+  "tokens": {
+    "BRAND_NAME": "Moshu Jiuba",
+    "BRAND_SHORT": "Moshu",
+    "BRAND_ZH": "魔术",
+    "BRAND_ZH_NAME": "魔术酒吧",
+    "SLUG": "moshu",
+    "CODE_PREFIX": "MS",
+    "DOMAIN": "moshucorp.com",
+    "INSTAGRAM": "@moshu.jiuba",
+    "WHATSAPP_URL": "https://wa.me/message/CTBRUPDO7YF2L1",
+    "ADDRESS": "Hampton Avenue Blok D 03, Paramount Gading Serpong, Kab. Tangerang, Banten 15810, Indonesia",
+    "OWNER_EMAIL": "moshumakmursejahtera@gmail.com",
+    "ADMIN_EMAIL": "admin@example.com",
+    "SUPABASE_URL": "https://YOUR-PROJECT.supabase.co",
+    "SUPABASE_KEY": "sb_publishable_YOUR_KEY",
+    "C_PRIMARY": "#223849",
+    "C_DARK": "#14232F",
+    "C_ACCENT": "#AF975B",
+    "C_ACCENT_TEXT": "#D9C68F",
+    "C_HIGHLIGHT": "#992626",
+    "C_LIGHT": "#F6EFE3",
+    "C_MUTED": "#BCAA8E"
+  }
+}
