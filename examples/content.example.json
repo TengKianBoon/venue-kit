@@ -1,0 +1,124 @@
+{
+  "menu": [
+    {
+      "cat": "Grill",
+      "zh": "烧烤",
+      "group": "Food",
+      "photo": "",
+      "items": [
+        {
+          "n": "Chicken skewer",
+          "p": "Rp 12K",
+          "zh": "鸡肉串",
+          "en": "Chicken skewer",
+          "tag": "Favourite"
+        },
+        {
+          "n": "Corn",
+          "p": "Rp 8K",
+          "zh": "玉米",
+          "en": "Grilled corn"
+        }
+      ]
+    },
+    {
+      "cat": "Mocktails",
+      "zh": "无酒精饮品",
+      "group": "Drinks",
+      "items": [
+        {
+          "n": "Lychee Fizz",
+          "p": "Rp 35K",
+          "zh": "荔枝气泡",
+          "en": "Lychee soda, lime, mint"
+        }
+      ]
+    }
+  ],
+  "singers": [
+    {
+      "n": "Singer A",
+      "g": "Live acoustic",
+      "next": "Fri",
+      "photo": "",
+      "bio": "Acoustic sets, 8–10.30 pm"
+    }
+  ],
+  "week": [
+    {
+      "d": "Mon",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    },
+    {
+      "d": "Tue",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    },
+    {
+      "d": "Wed",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    },
+    {
+      "d": "Thu",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    },
+    {
+      "d": "Fri",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "Singer A"
+    },
+    {
+      "d": "Sat",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    },
+    {
+      "d": "Sun",
+      "t": "Live Acoustic",
+      "s": "8–10.30 pm",
+      "who": "[Singer name]"
+    }
+  ],
+  "promos": [
+    {
+      "slug": "happy-hour",
+      "t": "Happy Hour",
+      "h": "20% off regular-price drinks",
+      "when": "Sun–Thu · 5–8 pm",
+      "valid": "This month",
+      "alc": false,
+      "tc": [
+        "Regular-price items only",
+        "Not valid with other promotions"
+      ],
+      "cta": [
+        "Book a table",
+        "#book"
+      ],
+      "active": true,
+      "start": "",
+      "end": "",
+      "voucher": {
+        "enabled": true,
+        "title": "Happy Hour 20%",
+        "pct": 20,
+        "days": 30
+      }
+    }
+  ],
+  "banner": {
+    "active": true,
+    "text": "Live music every night from 8 pm",
+    "link": "WA",
+    "style": "gold"
+  }
+}
