@@ -1,0 +1,28 @@
+{
+  "name": "Example Venue",
+  "live_url": "",
+  "notes": "Copy this folder, rename it, edit the values, run the build.",
+  "tokens": {
+    "BRAND_NAME": "Lantern Room",
+    "BRAND_SHORT": "Lantern",
+    "BRAND_ZH": "灯笼",
+    "BRAND_ZH_NAME": "灯笼酒廊",
+    "SLUG": "lantern",
+    "CODE_PREFIX": "LR",
+    "DOMAIN": "lantern.example",
+    "INSTAGRAM": "@lantern.example",
+    "WHATSAPP_URL": "https://wa.me/620000000000",
+    "ADDRESS": "1 Example Street, Example City",
+    "OWNER_EMAIL": "owner@lantern.example",
+    "ADMIN_EMAIL": "admin@lantern.example",
+    "SUPABASE_URL": "https://YOUR-PROJECT.supabase.co",
+    "SUPABASE_KEY": "sb_publishable_YOUR_KEY",
+    "C_PRIMARY": "#1F3B2D",
+    "C_DARK": "#0F1F17",
+    "C_ACCENT": "#C8A24A",
+    "C_ACCENT_TEXT": "#E6CF8A",
+    "C_HIGHLIGHT": "#B23A2E",
+    "C_LIGHT": "#F4F1E8",
+    "C_MUTED": "#A9A08A"
+  }
+}
