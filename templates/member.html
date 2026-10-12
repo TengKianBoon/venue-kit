@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BRAND_SHORT}} Member · {{BRAND_ZH}}会员</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bellefair&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root{--navy:{{C_PRIMARY}};--navyd:{{C_DARK}};--panel:#2B4559;--gold:{{C_ACCENT}};--gtext:{{C_ACCENT_TEXT}};--red:{{C_HIGHLIGHT}};--cream:{{C_LIGHT}};--mute:{{C_MUTED}}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navyd);color:var(--cream);font:16px/1.55 "Plus Jakarta Sans",system-ui,sans-serif}
+a{color:var(--gtext)}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 16px;max-width:720px;margin:auto}
+header img{height:38px}
+.langs button{background:none;border:1px solid #3d566a;color:var(--mute);border-radius:999px;padding:3px 10px;font:inherit;font-size:13px;cursor:pointer}
+.langs button.on{color:var(--navyd);background:var(--gtext);border-color:var(--gtext)}
+main{max-width:720px;margin:auto;padding:0 16px 64px}
+h1,h2{font-family:Bellefair,serif;font-weight:400;letter-spacing:.5px}
+h1{font-size:34px;margin:12px 0 4px}h2{font-size:24px;margin:0 0 10px;color:var(--gtext)}
+.card{background:var(--navy);border:1px solid #344f63;border-radius:16px;padding:18px;margin:14px 0}
+.btn{text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:10px;border:0;border-radius:12px;padding:13px 18px;font:600 16px/1 "Plus Jakarta Sans",sans-serif;cursor:pointer;width:100%}
+.btn-g{background:#fff;color:#222}
+.btn-gold{background:var(--gold);color:var(--navyd)}
+.btn-ghost{background:none;border:1px solid #4a6378;color:var(--cream)}
+.btn:disabled{opacity:.6;cursor:wait}
+label{display:block;font-size:14px;color:var(--mute);margin:12px 0 4px}
+input,select,textarea{width:100%;padding:11px 12px;border-radius:10px;border:1px solid #4a6378;background:var(--navyd);color:var(--cream);font:inherit}
+.check{display:flex;gap:10px;align-items:flex-start;margin:12px 0;font-size:14px;color:var(--cream)}
+.check input{width:auto;margin-top:4px}
+.mcard{background:linear-gradient(135deg,{{C_HIGHLIGHT}},#5c1717 60%,{{C_DARK}});border-radius:18px;padding:20px;position:relative;overflow:hidden}
+.mcard .tier{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--gtext)}
+.mcard .name{font-family:Bellefair,serif;font-size:30px;margin:4px 0}
+.mcard .code{font-size:15px;letter-spacing:3px;color:var(--gtext)}
+.qr{background:#fff;padding:10px;border-radius:12px;width:fit-content;margin:14px auto 4px}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:14px}
+.stat{background:rgba(0,0,0,.25);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--gtext)}
+.stat span{font-size:12px;color:var(--mute)}
+.item{border-top:1px solid #344f63;padding:10px 0;display:flex;justify-content:space-between;gap:10px}
+.item:first-of-type{border-top:0}
+.muted{color:var(--mute);font-size:14px}
+.pill{font-size:12px;border-radius:999px;padding:2px 9px;background:#344f63;color:var(--cream);white-space:nowrap;height:fit-content}
+.pill.ok{background:#2f6b4a}.pill.warn{background:#7a5a1e}
+.bar{height:8px;background:{{C_DARK}};border-radius:6px;overflow:hidden;margin-top:6px}.bar i{display:block;height:100%;background:var(--gold)}
+.row{display:flex;gap:10px}.row>*{flex:1}
+.msg{padding:10px 12px;border-radius:10px;margin:10px 0;font-size:14px}
+.msg.err{background:#5c1717}.msg.ok{background:#2f6b4a}
+.hide{display:none!important}
+footer{text-align:center;font-size:13px;color:var(--mute);padding:20px}
+</style>
+</head>
+<body>
+<header>
+  <a href="/"><img src="/img/logo.png" alt="{{BRAND_NAME}}"></a>
+  <div class="langs"><button data-l="en">EN</button> <button data-l="id">ID</button> <button data-l="zh">中文</button></div>
+</header>
+<main>
+  <div id="loading" class="card muted" data-t="loading">Loading…</div>
+
+  <!-- Signed out -->
+  <section id="v-signin" class="hide">
+    <h1 data-t="join_title">{{BRAND_SHORT}} Member</h1>
+    <p class="muted" data-t="join_sub">Free membership. 10% off your first visit, birthday-month treats, bottle keeping and song requests.</p>
+    <div class="card">
+      <button id="b-google" class="btn btn-g"><svg width="20" height="20" viewBox="0 0 48 48"><path fill="#FFC107" d="M43.6 20.5H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 12.9 4 4 12.9 4 24s8.9 20 20 20 20-8.9 20-20c0-1.3-.1-2.4-.4-3.5z"/><path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 15.1 19 12 24 12c3.1 0 5.8 1.2 7.9 3.1l5.7-5.7C34 6.1 29.3 4 24 4 16.3 4 9.7 8.3 6.3 14.7z"/><path fill="#4CAF50" d="M24 44c5.2 0 9.9-2 13.4-5.2l-6.2-5.2C29.2 35.1 26.7 36 24 36c-5.2 0-9.6-3.3-11.3-8l-6.5 5C9.5 39.6 16.2 44 24 44z"/><path fill="#1976D2" d="M43.6 20.5H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.2 5.2C37 39.2 44 34 44 24c0-1.3-.1-2.4-.4-3.5z"/></svg><span data-t="google">Continue with Google</span></button>
+      <div id="email-box" class="hide">
+        <p class="muted" style="text-align:center;margin:14px 0 4px" data-t="or_email">or get a sign-in link by email</p>
+        <input id="i-email" type="email" placeholder="you@example.com" autocomplete="email">
+        <button id="b-email" class="btn btn-ghost" style="margin-top:10px" data-t="send_link">Email me a sign-in link</button>
+      </div>
+      <div id="signin-msg"></div>
+    </div>
+    <p class="muted" data-t="no_gmail">No Gmail? Join via WhatsApp and our team will add you.</p>
+    <a class="btn btn-ghost" href="{{WHATSAPP_URL}}" target="_blank" rel="noopener" data-t="wa">Join via WhatsApp</a>
+  </section>
+
+  <!-- Complete profile -->
+  <section id="v-profile" class="hide">
+    <h1 data-t="welcome">Welcome to {{BRAND_SHORT}}</h1>
+    <p class="muted" data-t="profile_sub">One last step. Tell us a little about you.</p>
+    <div class="card">
+      <label data-t="f_name">Full name</label><input id="p-name" autocomplete="name">
+      <label data-t="f_phone">Phone / WhatsApp</label><input id="p-phone" type="tel" placeholder="08xx xxxx xxxx" autocomplete="tel">
+      <label data-t="f_bday">Birthday</label><input id="p-bday" type="date">
+      <label class="check"><input id="p-adult" type="checkbox"> <span data-t="c_adult">I am 21 years old or older.</span></label>
+      <label class="check"><input id="p-privacy" type="checkbox"> <span><span data-t="c_privacy">I agree to the</span> <a href="/privacy.html" target="_blank" data-t="privacy">Privacy Policy</a>.</span></label>
+      <label class="check"><input id="p-promo" type="checkbox"> <span data-t="c_promo">Send me {{BRAND_SHORT}} promotions (optional).</span></label>
+      <button id="b-save-profile" class="btn btn-gold" data-t="save">Save</button>
+      <div id="profile-msg"></div>
+    </div>
+  </section>
+
+  <!-- Dashboard -->
+  <section id="v-dash" class="hide">
+    <div class="mcard">
+      <div class="tier" id="d-tier">Member</div>
+      <div class="name" id="d-name"></div>
+      <div class="code" id="d-code"></div>
+      <div class="qr" id="d-qr"></div>
+      <p class="muted" style="text-align:center;margin:4px 0 0;color:#eadfca" data-t="show_qr">Show this QR to our staff at every visit.</p>
+      <div class="stats">
+        <div class="stat"><b id="d-visits">0</b><span data-t="visits">Visits</span></div>
+        <div class="stat"><b id="d-spend">0</b><span data-t="spend">Spend (Rp)</span></div>
+        <div class="stat"><b id="d-vcount">0</b><span data-t="vouchers">Vouchers</span></div>
+      </div>
+    </div>
+
+    <div class="card hide" id="claim-card"><h2 data-t="claim_title">Member offers to claim</h2><div id="d-claim"></div><div id="claim-msg"></div></div>
+    <div class="card"><h2 data-t="my_vouchers">My vouchers</h2><div id="d-vouchers"></div></div>
+    <div class="card"><h2 data-t="my_bottles">My bottles</h2><div id="d-bottles"></div></div>
+
+    <div class="card">
+      <h2 data-t="song_req">Request a song</h2>
+      <p class="muted" data-t="song_sub">Tonight's singer will see your request. Subject to the singer's list.</p>
+      <div class="row"><div><label data-t="f_song">Song title</label><input id="s-title"></div><div><label data-t="f_artist">Artist</label><input id="s-artist"></div></div>
+      <label data-t="f_dedic">Dedication (optional)</label><input id="s-dedic" maxlength="120">
+      <button id="b-song" class="btn btn-gold" style="margin-top:12px" data-t="send_req">Send request</button>
+      <div id="song-msg"></div>
+      <div id="d-songs" style="margin-top:10px"></div>
+    </div>
+
+    <div class="card"><h2 data-t="history">Recent visits</h2><div id="d-history"></div></div>
+
+    <div class="card">
+      <h2 data-t="my_profile">My profile</h2>
+      <label data-t="f_name">Full name</label><input id="e-name">
+      <label data-t="f_phone">Phone / WhatsApp</label><input id="e-phone" type="tel">
+      <label data-t="f_bday">Birthday</label><input id="e-bday" type="date">
+      <label class="check"><input id="e-promo" type="checkbox"> <span data-t="c_promo">Send me {{BRAND_SHORT}} promotions (optional).</span></label>
+      <button id="b-update" class="btn btn-ghost" data-t="update">Update profile</button>
+      <div id="update-msg"></div>
+      <p class="muted" id="d-email" style="margin-top:12px"></p>
+      <p class="muted"><span data-t="delete_hint">To delete your account, message us on WhatsApp.</span></p>
+      <button id="b-signout" class="btn btn-ghost" style="margin-top:6px" data-t="signout">Sign out</button>
+    </div>
+  </section>
+</main>
+<footer><a href="/">{{DOMAIN}}</a> · <a href="/privacy.html" data-t="privacy">Privacy Policy</a></footer>
+
+<script>
+const SUPABASE_URL='{{SUPABASE_URL}}';
+const SUPABASE_KEY='{{SUPABASE_KEY}}'; // public key; data protected by row-level security
+const EMAIL_LOGIN=false; // switch on once a custom email sender (SMTP) is connected in Supabase
+const SafeStore={getItem:k=>{try{const v=localStorage.getItem(k);if(v!==null)return v}catch(e){}try{return sessionStorage.getItem(k)}catch(e){return null}},setItem:(k,v)=>{let ok=false;try{localStorage.setItem(k,v);ok=localStorage.getItem(k)===v}catch(e){}if(!ok){try{sessionStorage.setItem(k,v)}catch(e){}}},removeItem:k=>{try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}}; // falls back to per-tab storage when a browser blocks saving sign-in data
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{storage:SafeStore,flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const $=id=>document.getElementById(id);
+const T={
+ en:{},
+ id:{loading:'Memuat…',join_title:'Member {{BRAND_SHORT}}',join_sub:'Gratis. Diskon 10% kunjungan pertama, promo bulan ulang tahun, simpan botol dan request lagu.',google:'Lanjut dengan Google',or_email:'atau dapatkan link masuk via email',send_link:'Kirim link masuk',no_gmail:'Tidak punya Gmail? Daftar via WhatsApp, tim kami akan menambahkan Anda.',wa:'Daftar via WhatsApp',welcome:'Selamat datang di {{BRAND_SHORT}}',profile_sub:'Satu langkah lagi. Ceritakan sedikit tentang Anda.',f_name:'Nama lengkap',f_phone:'Telepon / WhatsApp',f_bday:'Tanggal lahir',c_adult:'Saya berusia 21 tahun atau lebih.',c_privacy:'Saya setuju dengan',privacy:'Kebijakan Privasi',c_promo:'Kirimi saya promo {{BRAND_SHORT}} (opsional).',save:'Simpan',show_qr:'Tunjukkan QR ini ke staf kami setiap berkunjung.',visits:'Kunjungan',spend:'Belanja (Rp)',vouchers:'Voucher',my_vouchers:'Voucher saya',my_bottles:'Botol saya',song_req:'Request lagu',song_sub:'Penyanyi malam ini akan melihat request Anda. Sesuai daftar lagu penyanyi.',f_song:'Judul lagu',f_artist:'Penyanyi',f_dedic:'Ucapan (opsional)',send_req:'Kirim request',history:'Kunjungan terakhir',claim_title:'Penawaran member untuk diklaim',my_profile:'Profil saya',update:'Perbarui profil',delete_hint:'Untuk menghapus akun, hubungi kami via WhatsApp.',signout:'Keluar'},
+ zh:{loading:'加载中…',join_title:'{{BRAND_ZH}}会员',join_sub:'免费入会。首次到店九折、生日月礼遇、存酒和点歌。',google:'使用 Google 登录',or_email:'或通过电子邮件获取登录链接',send_link:'发送登录链接',no_gmail:'没有 Gmail？通过 WhatsApp 加入，我们的团队会为您登记。',wa:'通过 WhatsApp 加入',welcome:'欢迎来到{{BRAND_ZH}}',profile_sub:'最后一步，请填写您的资料。',f_name:'姓名',f_phone:'电话 / WhatsApp',f_bday:'生日',c_adult:'我已年满21岁。',c_privacy:'我同意',privacy:'隐私政策',c_promo:'接收{{BRAND_ZH}}的优惠信息（可选）。',save:'保存',show_qr:'每次到店请向工作人员出示此二维码。',visits:'到店次数',spend:'消费 (Rp)',vouchers:'优惠券',my_vouchers:'我的优惠券',my_bottles:'我的存酒',song_req:'点歌',song_sub:'今晚的歌手会看到您的点歌（以歌手曲目为准）。',f_song:'歌名',f_artist:'歌手',f_dedic:'祝福语（可选）',send_req:'发送点歌',history:'最近到店',claim_title:'可领取的会员优惠',my_profile:'我的资料',update:'更新资料',delete_hint:'如需删除账户，请通过 WhatsApp 联系我们。',signout:'退出登录'}
+};
+const EN={};document.querySelectorAll('[data-t]').forEach(e=>{EN[e.dataset.t]=e.textContent});
+let LANG='en';try{LANG=localStorage.getItem('{{SLUG}}_lang')||(navigator.language||'').slice(0,2)}catch(e){} if(!T[LANG])LANG='en';
+function t(k){return (T[LANG]&&T[LANG][k])||EN[k]||k}
+function applyLang(){document.querySelectorAll('[data-t]').forEach(e=>{e.textContent=t(e.dataset.t)});document.querySelectorAll('.langs button').forEach(b=>b.classList.toggle('on',b.dataset.l===LANG));document.documentElement.lang=LANG==='zh'?'zh':LANG}
+document.querySelectorAll('.langs button').forEach(b=>b.onclick=()=>{LANG=b.dataset.l;try{localStorage.setItem('{{SLUG}}_lang',LANG)}catch(e){};applyLang()});
+applyLang();
+
+const show=v=>{['loading','v-signin','v-profile','v-dash'].forEach(x=>$(x).classList.toggle('hide',x!==v))};
+const msg=(id,text,ok)=>{$(id).innerHTML=text?`<div class="msg ${ok?'ok':'err'}">${text}</div>`:''};
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rp=n=>Number(n||0).toLocaleString('id-ID');
+const d8=s=>s?new Date(s).toLocaleDateString(LANG==='zh'?'zh-CN':LANG==='id'?'id-ID':'en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+let ME=null;
+
+if(EMAIL_LOGIN) $('email-box').classList.remove('hide');
+$('b-google').onclick=async()=>{ $('b-google').disabled=true; try{localStorage.setItem('{{SLUG}}_return','/member.html')}catch(e){}
+  const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/member.html'}});
+  if(error){msg('signin-msg',error.message);$('b-google').disabled=false;} };
+$('b-email').onclick=async()=>{ const email=$('i-email').value.trim(); if(!email) return;
+  $('b-email').disabled=true;
+  const {error}=await sb.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+'/member.html'}});
+  $('b-email').disabled=false; msg('signin-msg',error?error.message:'Check your inbox for the sign-in link.',!error); };
+
+async function loadMe(user){
+  for(let i=0;i<5;i++){ const {data}=await sb.from('members').select('*').eq('id',user.id).maybeSingle(); if(data) return data; await new Promise(r=>setTimeout(r,800)); }
+  return null;
+}
+let BOOTING=false;
+async function boot(){
+  if(BOOTING) return; BOOTING=true;
+  try{ await bootInner() } finally { BOOTING=false }
+}
+async function bootInner(){
+  const PR=new URLSearchParams(location.search.slice(1)+'&'+location.hash.slice(1)); const AERR=PR.get('error_description');
+  const HADCODE=PR.has('code')||PR.has('access_token'); let session=null, SERR=''; try{const g=await sb.auth.getSession(); session=g.data.session; if(g.error) SERR=g.error.message;}catch(e){SERR=e.message} if(false){show('v-signin');msg('signin-msg','Sign-in problem: '+e.message);return}
+  if(!session){show('v-signin'); if(AERR||SERR||HADCODE) msg('signin-msg','Google sign-in did not finish: '+(AERR||SERR||'the sign-in could not be saved in this browser')+'. Please tap Continue with Google again.'); return;}
+  if(location.hash.includes('access_token')||location.search.includes('code=')) history.replaceState(null,'',location.pathname);
+  ME=await loadMe(session.user);
+  if(!ME){show('v-signin');msg('signin-msg','We could not load your membership. Please try again or message us on WhatsApp.');return;}
+  if(!ME.privacy_accepted_at||!ME.phone||!ME.full_name){
+    $('p-name').value=ME.full_name||session.user.user_metadata?.full_name||'';
+    $('p-phone').value=ME.phone||''; $('p-bday').value=ME.birthday||'';
+    show('v-profile'); return;
+  }
+  renderDash(session.user);
+}
+$('b-save-profile').onclick=async()=>{
+  const name=$('p-name').value.trim(), phone=$('p-phone').value.trim(), bday=$('p-bday').value||null;
+  if(!name||!phone) return msg('profile-msg','Please fill in your name and phone.');
+  if(!$('p-adult').checked) return msg('profile-msg','Membership is for ages 21 and over.');
+  if(!$('p-privacy').checked) return msg('profile-msg','Please agree to the Privacy Policy.');
+  $('b-save-profile').disabled=true;
+  const {error}=await sb.from('members').update({full_name:name,phone,birthday:bday,marketing_opt_in:$('p-promo').checked,privacy_accepted_at:new Date().toISOString(),updated_at:new Date().toISOString()}).eq('id',ME.id);
+  $('b-save-profile').disabled=false;
+  if(error) return msg('profile-msg',error.message);
+  boot();
+};
+async function renderDash(user){
+  show('v-dash');
+  $('d-name').textContent=ME.full_name; $('d-tier').textContent=ME.tier; $('d-code').textContent=ME.member_code;
+  $('d-visits').textContent=ME.visit_count; $('d-spend').textContent=rp(ME.total_spend_idr);
+  $('d-qr').innerHTML=''; new QRCode($('d-qr'),{text:ME.member_code,width:168,height:168,correctLevel:QRCode.CorrectLevel.M});
+  $('e-name').value=ME.full_name||''; $('e-phone').value=ME.phone||''; $('e-bday').value=ME.birthday||''; $('e-promo').checked=!!ME.marketing_opt_in;
+  $('d-email').textContent=(user.email?user.email+' · ':'')+'Member since '+d8(ME.created_at);
+  const [v,b,s,h]=await Promise.all([
+    sb.from('vouchers').select('*').eq('member_id',ME.id).order('created_at',{ascending:false}),
+    sb.from('bottles').select('*').eq('member_id',ME.id).order('stored_at',{ascending:false}),
+    sb.from('song_requests').select('*').eq('member_id',ME.id).order('requested_at',{ascending:false}).limit(5),
+    sb.from('visits').select('*').eq('member_id',ME.id).order('visit_at',{ascending:false}).limit(10)]);
+  const today=new Date().toISOString().slice(0,10);
+  const vs=(v.data||[]); const active=vs.filter(x=>x.status==='active'&&(!x.valid_to||x.valid_to>=today));
+  $('d-vcount').textContent=active.length;
+  $('d-vouchers').innerHTML=vs.length?vs.map(x=>{const exp=x.status==='active'&&x.valid_to&&x.valid_to<today;const st=exp?'expired':x.status;
+    return `<div class="item"><div><b>${esc(x.title)}</b>${x.discount_pct?` · ${x.discount_pct}%`:''}<div class="muted">${esc(x.details||'')}${x.valid_to?' · until '+d8(x.valid_to):''}</div></div><span class="pill ${st==='active'?'ok':''}">${st}</span></div>`}).join(''):'<p class="muted">No vouchers yet.</p>';
+  renderClaims(vs);
+  const bs=(b.data||[]);
+  $('d-bottles').innerHTML=bs.length?bs.map(x=>`<div class="item"><div style="flex:1"><b>${esc(x.bottle_name)}</b><div class="muted">Stored ${d8(x.stored_at)}${x.expires_at?' · keep until '+d8(x.expires_at):''}</div><div class="bar"><i style="width:${x.remaining_pct}%"></i></div></div><span class="pill ${x.status==='stored'?'ok':''}">${x.status==='stored'?x.remaining_pct+'%':x.status}</span></div>`).join(''):'<p class="muted">No bottles kept yet.</p>';
+  $('d-songs').innerHTML=(s.data||[]).map(x=>`<div class="item"><div>${esc(x.song_title)}${x.artist?' · '+esc(x.artist):''}<div class="muted">${d8(x.requested_at)}</div></div><span class="pill">${x.status}</span></div>`).join('');
+  $('d-history').innerHTML=(h.data||[]).length?h.data.map(x=>`<div class="item"><div>${d8(x.visit_at)}</div><div>Rp ${rp(x.spend_idr)}</div></div>`).join(''):'<p class="muted">Your visits will show here after staff scan your QR.</p>';
+}
+async function renderClaims(myVouchers){
+  try{
+    const {data}=await sb.from('site_content').select('data').eq('key','promos').maybeSingle();
+    const t=new Date().toISOString().slice(0,10);
+    const P=((data&&data.data)||[]).filter(p=>p.voucher&&p.voucher.enabled&&p.active!==false&&(!p.start||p.start<=t)&&(!p.end||p.end>=t));
+    if(!P.length){$('claim-card').classList.add('hide');return}
+    const got=new Set((myVouchers||[]).map(v=>v.promo_slug).filter(Boolean));
+    $('claim-card').classList.remove('hide');
+    $('d-claim').innerHTML=P.map(p=>`<div class="item" id="claim-${esc(p.slug)}"><div><b>${esc(p.voucher.title||p.t)}</b>${p.voucher.pct?` · ${esc(p.voucher.pct)}%`:''}<div class="muted">${esc(p.h||'')}${p.voucher.days?' · valid '+esc(p.voucher.days)+' days after claiming':''}</div></div>${got.has(p.slug)?'<span class="pill ok">Claimed</span>':`<button class="btn btn-gold" style="width:auto;padding:9px 14px" onclick="claimPromo('${esc(p.slug)}',this)">Claim</button>`}</div>`).join('');
+    const h=location.hash.match(/^#claim-(.+)$/); if(h){const el=document.getElementById('claim-'+h[1]); if(el){el.scrollIntoView({block:'center'}); el.style.outline='2px solid {{C_ACCENT}}';}}
+  }catch(e){console.warn(e)}
+}
+async function claimPromo(slug,btn){
+  btn.disabled=true;
+  const {error}=await sb.rpc('claim_promo_voucher',{p_slug:slug});
+  if(error){btn.disabled=false;return msg('claim-msg',error.message)}
+  msg('claim-msg','Voucher added! Show your member QR to the cashier to use it.',true);
+  const {data:{user}}=await sb.auth.getUser(); renderDash(user);
+}
+$('b-song').onclick=async()=>{
+  const title=$('s-title').value.trim(); if(!title) return msg('song-msg','Please type a song title.');
+  $('b-song').disabled=true;
+  const {error}=await sb.from('song_requests').insert({member_id:ME.id,song_title:title,artist:$('s-artist').value.trim()||null,dedication:$('s-dedic').value.trim()||null});
+  $('b-song').disabled=false;
+  if(error) return msg('song-msg',error.message);
+  ['s-title','s-artist','s-dedic'].forEach(i=>$(i).value=''); msg('song-msg','Request sent!',true);
+  const {data:{user}}=await sb.auth.getUser(); renderDash(user);
+};
+$('b-update').onclick=async()=>{
+  const {error}=await sb.from('members').update({full_name:$('e-name').value.trim(),phone:$('e-phone').value.trim(),birthday:$('e-bday').value||null,marketing_opt_in:$('e-promo').checked,updated_at:new Date().toISOString()}).eq('id',ME.id);
+  msg('update-msg',error?error.message:'Saved.',!error); if(!error){ME=await loadMe({id:ME.id});$('d-name').textContent=ME.full_name;}
+};
+$('b-signout').onclick=async()=>{await sb.auth.signOut();location.href='/member.html'};
+sb.auth.onAuthStateChange((ev)=>{ if(ev==='SIGNED_IN'&&!ME) boot(); });
+boot();
+</script>
+</body>
+</html>

@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>{{BRAND_SHORT}} Admin</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="/img/logo.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bellefair&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+<script src="/admin-content.js" defer></script>
+<style>
+:root{--navy:{{C_PRIMARY}};--navyd:{{C_DARK}};--gold:{{C_ACCENT}};--gtext:{{C_ACCENT_TEXT}};--red:{{C_HIGHLIGHT}};--cream:{{C_LIGHT}};--mute:{{C_MUTED}};--line:#344f63}
+*{box-sizing:border-box}
+body{margin:0;background:var(--navyd);color:var(--cream);font:15px/1.5 "Plus Jakarta Sans",system-ui,sans-serif}
+a{color:var(--gtext)}
+header{display:flex;align-items:center;gap:12px;padding:12px 16px;border-bottom:1px solid var(--line);flex-wrap:wrap}
+header img{height:34px}header .who{margin-left:auto;font-size:13px;color:var(--mute)}
+nav{display:flex;gap:6px;padding:10px 16px;overflow-x:auto;border-bottom:1px solid var(--line)}
+nav button{background:none;border:1px solid var(--line);color:var(--cream);border-radius:999px;padding:7px 14px;font:inherit;cursor:pointer;white-space:nowrap}
+nav button.on{background:var(--gold);border-color:var(--gold);color:var(--navyd);font-weight:700}
+main{max-width:1000px;margin:auto;padding:16px}
+h1,h2,h3{font-family:Bellefair,serif;font-weight:400}h2{color:var(--gtext);margin:6px 0 10px;font-size:24px}h3{font-size:20px;margin:14px 0 6px;color:var(--gtext)}
+.card{background:var(--navy);border:1px solid var(--line);border-radius:14px;padding:16px;margin:12px 0}
+input,select,textarea{width:100%;padding:9px 11px;border-radius:9px;border:1px solid #4a6378;background:var(--navyd);color:var(--cream);font:inherit}
+label{display:block;font-size:13px;color:var(--mute);margin:8px 0 3px}
+.btn{border:0;border-radius:10px;padding:10px 14px;font:600 15px/1 "Plus Jakarta Sans",sans-serif;cursor:pointer;background:var(--gold);color:var(--navyd)}
+.btn.ghost{background:none;border:1px solid #4a6378;color:var(--cream)}
+.btn.small{padding:6px 10px;font-size:13px}
+.btn.red{background:var(--red);color:#fff}
+.btn:disabled{opacity:.6}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+th{color:var(--mute);font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.5px}
+tr.click{cursor:pointer}tr.click:hover{background:#1b2e3c}
+.pill{font-size:12px;border-radius:999px;padding:2px 9px;background:#344f63;white-space:nowrap}
+.pill.ok{background:#2f6b4a}.pill.warn{background:#7a5a1e}.pill.red{background:#5c1717}
+.muted{color:var(--mute);font-size:13px}
+.msg{padding:9px 12px;border-radius:9px;margin:8px 0;font-size:14px}.msg.err{background:#5c1717}.msg.ok{background:#2f6b4a}
+.row{display:flex;gap:8px;align-items:end;flex-wrap:wrap}.row>*{flex:1;min-width:120px}
+.hide{display:none!important}
+.kpi{background:var(--navyd);border-radius:12px;padding:12px}.kpi b{display:block;font-size:22px;color:var(--gtext)}
+.scroll{overflow-x:auto}
+.item{border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;background:#1a2c3a}.item.off{opacity:.55}
+.thumb{width:64px;height:64px;border-radius:8px;object-fit:cover;background:#0f1b24;border:1px solid var(--line)}
+.chk{display:flex;gap:8px;align-items:center;font-size:14px;color:var(--cream);margin:8px 0}.chk input{width:auto}
+.bar{position:sticky;bottom:0;background:var(--navyd);padding:10px 0;border-top:1px solid var(--line);display:flex;gap:8px;align-items:center;flex-wrap:wrap;z-index:5}
+td input,td select{padding:6px 8px;font-size:13px}
+</style>
+</head>
+<body>
+<header><a href="/"><img src="/img/logo.png" alt="{{BRAND_SHORT}}"></a><b>{{BRAND_SHORT}} Admin</b><span class="who" id="who"></span></header>
+<nav id="nav" class="hide">
+  <button data-tab="members" class="on">Members</button>
+  <button data-tab="promos">Promotions</button>
+  <button data-tab="menu">Menu</button>
+  <button data-tab="singers">Singers &amp; line-up</button>
+  <button data-tab="banner">Banner</button>
+  <button data-tab="vouchers">Send vouchers</button>
+  <button data-tab="songs">Song requests</button>
+  <button data-tab="backup">Backup</button>
+  <button data-tab="admins">Admins</button>
+</nav>
+<main>
+  <div id="loading" class="card muted">Loading…</div>
+
+  <section id="v-signin" class="hide card" style="max-width:420px;margin:40px auto">
+    <h2>Admin sign in</h2>
+    <p class="muted">Only {{BRAND_SHORT}} admins can open this page.</p>
+    <button id="b-google" class="btn" style="width:100%">Sign in with Google</button>
+    <div id="signin-msg"></div>
+  </section>
+
+  <section id="v-denied" class="hide card" style="max-width:480px;margin:40px auto">
+    <h2>Not an admin</h2>
+    <p>This Google account is not on the {{BRAND_SHORT}} admin list. Ask the super admin to add your email under <b>Admins</b>.</p>
+    <p class="muted" id="denied-email"></p>
+    <button class="btn ghost" onclick="signOut()">Sign out</button>
+  </section>
+
+  <!-- MEMBERS -->
+  <section id="t-members" class="hide">
+    <div class="grid" id="kpis"></div>
+    <div class="card">
+      <div class="row">
+        <div style="flex:3"><label>Search name, phone, email or member code (scanner works here)</label><input id="q" placeholder="e.g. MS4F2A1B or 0812…" autofocus></div>
+        <div><label>Show</label><select id="filter"><option value="all">All members</option><option value="bday">Birthdays this month</option><option value="new">Joined last 7 days</option><option value="promo">Opted in to promos</option></select></div>
+      </div>
+      <div class="scroll"><table><thead><tr><th>Name</th><th>Code</th><th>Phone</th><th>Tier</th><th>Visits</th><th>Spend (Rp)</th><th>Joined</th></tr></thead><tbody id="m-list"></tbody></table></div>
+      <p class="muted" id="m-count"></p>
+    </div>
+
+    <div id="m-detail" class="card hide">
+      <div class="row" style="align-items:center"><h2 id="md-name" style="flex:3"></h2><button class="btn ghost small" style="flex:0" onclick="closeDetail()">Close ✕</button></div>
+      <p class="muted" id="md-meta"></p>
+      <div class="grid">
+        <div><label>Full name</label><input id="md-fullname"></div>
+        <div><label>Phone</label><input id="md-phone"></div>
+        <div><label>Birthday</label><input id="md-bday" type="date"></div>
+        <div><label>Tier</label><select id="md-tier"><option>Member</option><option>Silver</option><option>Gold</option><option>VIP</option></select></div>
+        <div><label>Phone confirmed (checked at bar)</label><select id="md-pc"><option value="false">Not yet</option><option value="true">Yes, confirmed</option></select></div>
+      </div>
+      <label>Staff notes (members cannot see this)</label><textarea id="md-notes" rows="2"></textarea>
+      <div style="margin-top:8px"><button class="btn small" onclick="saveMember()">Save member</button> <span id="md-msg"></span></div>
+
+      <h3>Record a visit</h3>
+      <div class="row"><div><label>Bill total (Rp)</label><input id="v-spend" type="number" min="0" step="1000" placeholder="e.g. 850000"></div><div><label>Staff name</label><input id="v-staff"></div><div style="flex:2"><label>Note</label><input id="v-note"></div><div style="flex:0"><button class="btn" onclick="addVisit()">Add visit</button></div></div>
+      <div class="scroll"><table><thead><tr><th>Date</th><th>Spend</th><th>Staff</th><th>Note</th><th></th></tr></thead><tbody id="md-visits"></tbody></table></div>
+
+      <h3>Vouchers</h3>
+      <div class="row"><div style="flex:2"><label>Voucher title</label><input id="vc-title" placeholder="e.g. Birthday treat"></div><div><label>Discount %</label><input id="vc-pct" type="number" min="0" max="100"></div><div><label>Valid until</label><input id="vc-to" type="date"></div><div style="flex:2"><label>Details</label><input id="vc-details" placeholder="e.g. Free birthday cake + shot"></div><div style="flex:0"><button class="btn" onclick="addVoucher()">Issue</button></div></div>
+      <div style="margin:6px 0"><button class="btn ghost small" onclick="quickVoucher('first')">+ First-visit 10% (7 days)</button> <button class="btn ghost small" onclick="quickVoucher('bday')">+ Birthday-month treat</button></div>
+      <div class="scroll"><table><thead><tr><th>Voucher</th><th>Until</th><th>Status</th><th></th></tr></thead><tbody id="md-vouchers"></tbody></table></div>
+
+      <h3>Bottles kept</h3>
+      <div class="row"><div style="flex:2"><label>Bottle</label><input id="b-name" placeholder="e.g. Chivas Regal 18"></div><div><label>Remaining %</label><input id="b-pct" type="number" min="0" max="100" value="100"></div><div><label>Keep until</label><input id="b-exp" type="date"></div><div style="flex:0"><button class="btn" onclick="addBottle()">Add bottle</button></div></div>
+      <div class="scroll"><table><thead><tr><th>Bottle</th><th>Stored</th><th>Until</th><th>Remaining</th><th>Status</th><th></th></tr></thead><tbody id="md-bottles"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- SONGS -->
+  <section id="t-songs" class="hide">
+    <div class="card">
+      <div class="row" style="align-items:center"><h2 style="flex:3">Song requests</h2><select id="song-filter" style="flex:1"><option value="open">New + queued</option><option value="all">All (last 200)</option></select><button class="btn ghost small" style="flex:0" onclick="loadSongs()">Refresh</button></div>
+      <div class="scroll"><table><thead><tr><th>Time</th><th>Song</th><th>Dedication</th><th>Member</th><th>Status</th><th>Change</th></tr></thead><tbody id="songs"></tbody></table></div>
+    </div>
+  </section>
+
+  <!-- CONTENT TABS (admin-content.js) -->
+  <section id="t-promos" class="hide"></section>
+  <section id="t-menu" class="hide"></section>
+  <section id="t-singers" class="hide"></section>
+  <section id="t-banner" class="hide"></section>
+  <section id="t-vouchers" class="hide"></section>
+
+  <!-- BACKUP -->
+  <section id="t-backup" class="hide">
+    <div class="card">
+      <h2>Weekly backup (every Monday)</h2>
+      <p>One click downloads <b>all member data</b> as one Excel file with a sheet for each table: Members, Visits, Vouchers, Bottles, Song requests. Save it in the {{BRAND_SHORT}} folder.</p>
+      <button id="b-backup" class="btn">Download backup (Excel)</button>
+      <div id="backup-msg"></div>
+      <p class="muted" id="last-backup"></p>
+    </div>
+  </section>
+
+  <!-- ADMINS -->
+  <section id="t-admins" class="hide">
+    <div class="card">
+      <h2>Who can open this admin page</h2>
+      <p class="muted">Add staff by their Google email. Staff sign in here with that Google account.</p>
+      <div class="row"><div style="flex:2"><label>Google email</label><input id="a-email" type="email"></div><div><label>Role</label><select id="a-role"><option value="staff">Staff</option><option value="admin">Admin</option><option value="super_admin">Super admin</option></select></div><div style="flex:0"><button class="btn" onclick="addAdmin()">Add</button></div></div>
+      <div id="admin-msg"></div>
+      <table><thead><tr><th>Email</th><th>Role</th><th>Added</th><th></th></tr></thead><tbody id="admins"></tbody></table>
+    </div>
+  </section>
+</main>
+
+<script>
+const SafeStore={getItem:k=>{try{const v=localStorage.getItem(k);if(v!==null)return v}catch(e){}try{return sessionStorage.getItem(k)}catch(e){return null}},setItem:(k,v)=>{let ok=false;try{localStorage.setItem(k,v);ok=localStorage.getItem(k)===v}catch(e){}if(!ok){try{sessionStorage.setItem(k,v)}catch(e){}}},removeItem:k=>{try{localStorage.removeItem(k)}catch(e){}try{sessionStorage.removeItem(k)}catch(e){}}}; // falls back to per-tab storage when a browser blocks saving sign-in data
+const sb=supabase.createClient('{{SUPABASE_URL}}','{{SUPABASE_KEY}}',{auth:{storage:SafeStore,flowType:'pkce',detectSessionInUrl:true,persistSession:true,autoRefreshToken:true}});
+const $=id=>document.getElementById(id);
+const esc=s=>String(s??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const rp=n=>Number(n||0).toLocaleString('id-ID');
+const d8=s=>s?new Date(s).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}):'';
+const dt=s=>s?new Date(s).toLocaleString('en-GB',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'';
+const msg=(id,text,ok)=>{$(id).innerHTML=text?`<div class="msg ${ok?'ok':'err'}">${esc(text)}</div>`:''};
+const todayISO=()=>new Date().toISOString().slice(0,10);
+const addDays=n=>{const d=new Date();d.setDate(d.getDate()+n);return d.toISOString().slice(0,10)};
+let MEMBERS=[], CUR=null, MYROLE='';
+
+function view(v){['loading','v-signin','v-denied','t-members','t-promos','t-menu','t-singers','t-banner','t-vouchers','t-songs','t-backup','t-admins'].forEach(x=>$(x).classList.toggle('hide',x!==v))}
+document.querySelectorAll('nav button').forEach(b=>b.onclick=()=>{document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x===b));view('t-'+b.dataset.tab);({members:loadMembers,songs:loadSongs,backup:showLastBackup,admins:loadAdmins,promos:()=>CM.open('promos'),menu:()=>CM.open('menu'),singers:()=>CM.open('singers'),banner:()=>CM.open('banner'),vouchers:()=>CM.open('vouchers')})[b.dataset.tab]()});
+$('b-google').onclick=async()=>{try{localStorage.setItem('{{SLUG}}_return','/admin.html')}catch(e){};const {error}=await sb.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+'/admin.html'}}); if(error) msg('signin-msg',error.message)};
+async function signOut(){await sb.auth.signOut();location.reload()}
+
+let BOOTING=false;
+async function boot(){
+  if(BOOTING) return; BOOTING=true;
+  try{ await bootInner() } finally { BOOTING=false }
+}
+async function bootInner(){
+  const PR=new URLSearchParams(location.search.slice(1)+'&'+location.hash.slice(1)); const AERR=PR.get('error_description');
+  const HADCODE=PR.has('code')||PR.has('access_token'); let session=null, SERR=''; try{const g=await sb.auth.getSession(); session=g.data.session; if(g.error) SERR=g.error.message;}catch(e){SERR=e.message} if(false){view('v-signin');msg('signin-msg','Sign-in problem: '+e.message);return}
+  if(!session){view('v-signin'); if(AERR||SERR||HADCODE) msg('signin-msg','Google sign-in did not finish: '+(AERR||SERR||'the sign-in could not be saved in this browser')+'. Please press Sign in with Google again.'); return}
+  if(location.hash.includes('access_token')||location.search.includes('code=')) history.replaceState(null,'',location.pathname);
+  const email=session.user.email||'';
+  const {data}=await sb.from('admin_emails').select('*').ilike('email',email);
+  if(!data||!data.length){$('denied-email').textContent='Signed in as '+email;view('v-denied');return}
+  MYROLE=data[0].role;
+  $('who').innerHTML=esc(email)+' · '+esc(MYROLE)+' · <a href="#" onclick="signOut();return false">Sign out</a>';
+  $('nav').classList.remove('hide'); view('t-members'); loadMembers();
+}
+
+/* ---------- Members ---------- */
+async function loadMembers(){
+  const {data,error}=await sb.from('members').select('*').order('created_at',{ascending:false}).limit(5000);
+  if(error){$('m-list').innerHTML=`<tr><td colspan=7>${esc(error.message)}</td></tr>`;return}
+  MEMBERS=data||[]; renderKpis(); renderList();
+}
+function renderKpis(){
+  const m=new Date().getMonth()+1, wk=addDays(-7);
+  const bd=MEMBERS.filter(x=>x.birthday&&+x.birthday.slice(5,7)===m).length;
+  const nw=MEMBERS.filter(x=>x.created_at.slice(0,10)>=wk).length;
+  const sp=MEMBERS.reduce((a,x)=>a+Number(x.total_spend_idr||0),0);
+  $('kpis').innerHTML=[['Members',MEMBERS.length],['New this week',nw],['Birthdays this month',bd],['Total spend (Rp)',rp(sp)]].map(([k,v])=>`<div class="kpi"><b>${v}</b><span class="muted">${k}</span></div>`).join('');
+}
+function renderList(){
+  const q=$('q').value.trim().toLowerCase(), f=$('filter').value, m=new Date().getMonth()+1, wk=addDays(-7);
+  let L=MEMBERS.filter(x=>!q||[x.full_name,x.phone,x.email,x.member_code].some(v=>(v||'').toLowerCase().includes(q)));
+  if(f==='bday')L=L.filter(x=>x.birthday&&+x.birthday.slice(5,7)===m);
+  if(f==='new')L=L.filter(x=>x.created_at.slice(0,10)>=wk);
+  if(f==='promo')L=L.filter(x=>x.marketing_opt_in);
+  $('m-list').innerHTML=L.slice(0,300).map(x=>`<tr class="click" onclick="openMember('${x.id}')"><td>${esc(x.full_name||'(no name yet)')}</td><td>${esc(x.member_code)}</td><td>${esc(x.phone||'')}${x.phone_confirmed?' ✓':''}</td><td>${esc(x.tier)}</td><td>${x.visit_count}</td><td>${rp(x.total_spend_idr)}</td><td>${d8(x.created_at)}</td></tr>`).join('')||'<tr><td colspan=7 class="muted">No members found.</td></tr>';
+  $('m-count').textContent=`${L.length} shown`+(L.length>300?' (first 300)':'');
+  if(q && L.length===1 && q===String(L[0].member_code).toLowerCase()) openMember(L[0].id);
+}
+$('q').oninput=renderList; $('filter').onchange=renderList;
+async function openMember(id){
+  CUR=MEMBERS.find(x=>x.id===id); if(!CUR) return;
+  $('m-detail').classList.remove('hide');
+  $('md-name').textContent=(CUR.full_name||'(no name)')+' · '+CUR.member_code;
+  $('md-meta').textContent=[CUR.email,CUR.phone,'Joined '+d8(CUR.created_at),CUR.marketing_opt_in?'Promos: yes':'Promos: no',CUR.privacy_accepted_at?'Privacy accepted '+d8(CUR.privacy_accepted_at):'Privacy not yet accepted'].filter(Boolean).join(' · ');
+  $('md-fullname').value=CUR.full_name||''; $('md-phone').value=CUR.phone||''; $('md-bday').value=CUR.birthday||'';
+  $('md-tier').value=CUR.tier; $('md-pc').value=String(CUR.phone_confirmed); $('md-notes').value=CUR.notes||'';
+  msg('md-msg',''); await loadDetail(); $('m-detail').scrollIntoView({behavior:'smooth'});
+}
+function closeDetail(){$('m-detail').classList.add('hide');CUR=null}
+async function loadDetail(){
+  const id=CUR.id;
+  const [v,vc,b]=await Promise.all([
+    sb.from('visits').select('*').eq('member_id',id).order('visit_at',{ascending:false}).limit(50),
+    sb.from('vouchers').select('*').eq('member_id',id).order('created_at',{ascending:false}),
+    sb.from('bottles').select('*').eq('member_id',id).order('stored_at',{ascending:false})]);
+  $('md-visits').innerHTML=(v.data||[]).map(x=>`<tr><td>${dt(x.visit_at)}</td><td>Rp ${rp(x.spend_idr)}</td><td>${esc(x.staff||'')}</td><td>${esc(x.notes||'')}</td><td><button class="btn ghost small" onclick="delRow('visits',${x.id})">Remove</button></td></tr>`).join('')||'<tr><td colspan=5 class="muted">No visits yet.</td></tr>';
+  const t=todayISO();
+  $('md-vouchers').innerHTML=(vc.data||[]).map(x=>{const exp=x.status==='active'&&x.valid_to&&x.valid_to<t;return `<tr><td><b>${esc(x.title)}</b>${x.discount_pct?' · '+x.discount_pct+'%':''}<div class="muted">${esc(x.details||'')}</div></td><td>${d8(x.valid_to)}</td><td><span class="pill ${x.status==='active'&&!exp?'ok':''}">${exp?'expired':x.status}${x.used_at?' '+d8(x.used_at):''}</span></td><td>${x.status==='active'?`<button class="btn small" onclick="useVoucher(${x.id})">Mark used</button> <button class="btn ghost small" onclick="setRow('vouchers',${x.id},{status:'cancelled'})">Cancel</button>`:''}</td></tr>`}).join('')||'<tr><td colspan=4 class="muted">No vouchers.</td></tr>';
+  $('md-bottles').innerHTML=(b.data||[]).map(x=>`<tr><td>${esc(x.bottle_name)}</td><td>${d8(x.stored_at)}</td><td>${d8(x.expires_at)}</td><td><input type="number" min="0" max="100" value="${x.remaining_pct}" style="width:80px" onchange="setRow('bottles',${x.id},{remaining_pct:+this.value})">%</td><td><select onchange="setRow('bottles',${x.id},{status:this.value})">${['stored','finished','collected','expired'].map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select></td><td></td></tr>`).join('')||'<tr><td colspan=6 class="muted">No bottles.</td></tr>';
+}
+async function refreshCur(){const {data}=await sb.from('members').select('*').eq('id',CUR.id).single(); if(data){const i=MEMBERS.findIndex(x=>x.id===data.id);MEMBERS[i]=data;CUR=data;renderKpis();renderList();$('md-name').textContent=(CUR.full_name||'(no name)')+' · '+CUR.member_code}}
+async function saveMember(){
+  const {error}=await sb.from('members').update({full_name:$('md-fullname').value.trim()||null,phone:$('md-phone').value.trim()||null,birthday:$('md-bday').value||null,tier:$('md-tier').value,phone_confirmed:$('md-pc').value==='true',notes:$('md-notes').value||null,updated_at:new Date().toISOString()}).eq('id',CUR.id);
+  msg('md-msg',error?error.message:'Saved.',!error); if(!error) refreshCur();
+}
+async function addVisit(){
+  const spend=Math.round(+$('v-spend').value||0);
+  const {error}=await sb.from('visits').insert({member_id:CUR.id,spend_idr:spend,staff:$('v-staff').value.trim()||null,notes:$('v-note').value.trim()||null});
+  if(error) return alertMsg(error.message);
+  $('v-spend').value='';$('v-note').value=''; await refreshCur(); loadDetail();
+}
+async function addVoucher(){
+  const title=$('vc-title').value.trim(); if(!title) return alertMsg('Type a voucher title.');
+  const {error}=await sb.from('vouchers').insert({member_id:CUR.id,title,discount_pct:$('vc-pct').value?+$('vc-pct').value:null,valid_to:$('vc-to').value||null,details:$('vc-details').value.trim()||null});
+  if(error) return alertMsg(error.message);
+  ['vc-title','vc-pct','vc-to','vc-details'].forEach(i=>$(i).value=''); loadDetail();
+}
+function quickVoucher(kind){
+  if(kind==='first'){$('vc-title').value='First visit 10% off';$('vc-pct').value=10;$('vc-to').value=addDays(7);$('vc-details').value='Valid 7 days from sign-up'}
+  else{const d=new Date();const end=new Date(d.getFullYear(),d.getMonth()+1,0).toISOString().slice(0,10);$('vc-title').value='Birthday-month treat';$('vc-pct').value='';$('vc-to').value=end;$('vc-details').value='Birthday-month discount + cake or shot'}
+}
+async function useVoucher(id){await setRow('vouchers',id,{status:'used',used_at:new Date().toISOString()})}
+async function addBottle(){
+  const name=$('b-name').value.trim(); if(!name) return alertMsg('Type the bottle name.');
+  const {error}=await sb.from('bottles').insert({member_id:CUR.id,bottle_name:name,remaining_pct:+$('b-pct').value||100,expires_at:$('b-exp').value||null});
+  if(error) return alertMsg(error.message);
+  $('b-name').value='';$('b-pct').value=100;$('b-exp').value=''; loadDetail();
+}
+async function setRow(table,id,patch){const {error}=await sb.from(table).update(patch).eq('id',id); if(error) return alertMsg(error.message); if(CUR) loadDetail(); if(table==='song_requests') loadSongs()}
+async function delRow(table,id){ if(!window.confirm('Remove this entry?')) return; const {error}=await sb.from(table).delete().eq('id',id); if(error) return alertMsg(error.message); await refreshCur(); loadDetail()}
+function alertMsg(t){msg('md-msg',t)}
+
+/* ---------- Songs ---------- */
+async function loadSongs(){
+  let q=sb.from('song_requests').select('*, members(full_name, member_code)').order('requested_at',{ascending:false}).limit(200);
+  if($('song-filter').value==='open') q=q.in('status',['new','queued']);
+  const {data,error}=await q;
+  if(error){$('songs').innerHTML=`<tr><td colspan=6>${esc(error.message)}</td></tr>`;return}
+  $('songs').innerHTML=(data||[]).map(x=>`<tr><td>${dt(x.requested_at)}</td><td><b>${esc(x.song_title)}</b>${x.artist?'<div class="muted">'+esc(x.artist)+'</div>':''}</td><td>${esc(x.dedication||'')}</td><td>${esc(x.members?.full_name||'')} <span class="muted">${esc(x.members?.member_code||'')}</span></td><td><span class="pill ${x.status==='new'?'warn':x.status==='played'?'ok':''}">${x.status}</span></td><td><select onchange="setRow('song_requests',${x.id},{status:this.value})">${['new','queued','played','declined'].map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select></td></tr>`).join('')||'<tr><td colspan=6 class="muted">No requests.</td></tr>';
+}
+$('song-filter').onchange=loadSongs;
+
+/* ---------- Backup ---------- */
+function showLastBackup(){let l='';try{l=localStorage.getItem('{{SLUG}}_last_backup')||''}catch(e){} $('last-backup').textContent=l?'Last backup from this computer: '+dt(l):'No backup downloaded from this computer yet.'}
+async function fetchAll(table,order){let all=[],from=0;for(;;){const {data,error}=await sb.from(table).select('*').order(order,{ascending:true}).range(from,from+999);if(error)throw error;all=all.concat(data);if(data.length<1000)break;from+=1000}return all}
+$('b-backup').onclick=async()=>{
+  $('b-backup').disabled=true; msg('backup-msg','Preparing…',true);
+  try{
+    const sets=[['Members','members','created_at'],['Visits','visits','visit_at'],['Vouchers','vouchers','created_at'],['Bottles','bottles','stored_at'],['Song requests','song_requests','requested_at']];
+    const wb=XLSX.utils.book_new(); let counts=[];
+    for(const [sheet,table,order] of sets){const rows=await fetchAll(table,order); counts.push(sheet+': '+rows.length); XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows.length?rows:[{note:'no rows'}]),sheet)}
+    try{const {data:sc}=await sb.from('site_content').select('*');const by={};(sc||[]).forEach(r=>by[r.key]=r.data);
+      if(by.menu){const rows=[];by.menu.forEach(c=>(c.items||[]).forEach(i=>rows.push({group:c.group,category:c.cat,item:i.n,chinese:i.zh||'',english:i.en||'',description:i.d||'',price:i.p||'',was:i.was||'',tag:i.tag||'',sold_out:!!i.out,hidden:!!(i.hide||c.hide)})));XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(rows),'Website menu');counts.push('Website menu: '+rows.length)}
+      if(by.promos){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(by.promos.map(p=>({title:p.t,headline:p.h,when:p.when,valid:p.valid,start:p.start||'',end:p.end||'',active:p.active!==false,terms:(p.tc||[]).join(' | '),voucher:p.voucher&&p.voucher.enabled?(p.voucher.title||p.t)+' '+(p.voucher.pct||'')+'%':''}))),'Website promotions')}
+      if(by.singers){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(by.singers.map(x=>({name:x.n,chinese:x.zh||'',style:x.g||'',days:x.next||'',bio:x.bio||'',hidden:!!x.hide}))),'Website singers')}
+      if(by.week){XLSX.utils.book_append_sheet(wb,XLSX.utils.json_to_sheet(by.week.map(w=>({day:w.d,show:w.t,time:w.s,singer:w.who}))),'Website line-up')}}catch(e){}
+    const name='{{BRAND_SHORT}}_Backup_'+todayISO()+'.xlsx'; XLSX.writeFile(wb,name);
+    try{localStorage.setItem('{{SLUG}}_last_backup',new Date().toISOString())}catch(e){}
+    msg('backup-msg','Downloaded '+name+' ('+counts.join(', ')+'). Find it in your Downloads folder.',true); showLastBackup();
+  }catch(e){msg('backup-msg','Backup failed: '+e.message)}
+  $('b-backup').disabled=false;
+};
+
+/* ---------- Admins ---------- */
+async function loadAdmins(){
+  const {data}=await sb.from('admin_emails').select('*').order('added_at');
+  $('admins').innerHTML=(data||[]).map(x=>`<tr><td>${esc(x.email)}</td><td>${esc(x.role)}</td><td>${d8(x.added_at)}</td><td>${MYROLE==='super_admin'||MYROLE==='admin'?`<button class="btn ghost small" onclick="removeAdmin('${esc(x.email)}')">Remove</button>`:''}</td></tr>`).join('');
+}
+async function addAdmin(){
+  const email=$('a-email').value.trim().toLowerCase(); if(!email.includes('@')) return msg('admin-msg','Type a valid email.');
+  if($('a-role').value==='super_admin'&&MYROLE!=='super_admin') return msg('admin-msg','Only a super admin can add a super admin.');
+  const {error}=await sb.from('admin_emails').insert({email,role:$('a-role').value});
+  msg('admin-msg',error?error.message:'Added '+email+'.',!error); if(!error){$('a-email').value='';loadAdmins()}
+}
+async function removeAdmin(email){
+  if(email==='{{OWNER_EMAIL}}') return msg('admin-msg','The owner account cannot be removed here.');
+  if(!window.confirm('Remove '+email+' from admins?')) return;
+  const {error}=await sb.from('admin_emails').delete().eq('email',email); msg('admin-msg',error?error.message:'Removed.',!error); loadAdmins();
+}
+sb.auth.onAuthStateChange(ev=>{if(ev==='SIGNED_IN' && !MYROLE) boot()});
+boot();
+</script>
+</body>
+</html>
